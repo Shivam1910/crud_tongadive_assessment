@@ -10,32 +10,52 @@ const api = axios.create({
 });
 
 export const dataService = {
-  // Create multiple records
-  bulkCreate: async (records) => {
-    const response = await api.post("/data/bulk", { records });
-    return response.data;
-  },
-
   // Get all records with pagination
   getAll: async (page = 1, limit = 10) => {
-    const response = await api.get("/data", {
-      params: { page, limit },
-    });
-    return response.data;
+    try {
+      const response = await api.get("/data", {
+        params: { page, limit },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      throw error;
+    }
   },
 
-  // Update multiple records
+  // Bulk create records
+  bulkCreate: async (records) => {
+    try {
+      const response = await api.post("/data/bulk", { records });
+      return response.data;
+    } catch (error) {
+      console.error("Error creating records:", error);
+      throw error;
+    }
+  },
+
+  // Bulk update records
   bulkUpdate: async (records) => {
-    const response = await api.put("/data/bulk", { records });
-    return response.data;
+    try {
+      const response = await api.put("/data/bulk", { records });
+      return response.data;
+    } catch (error) {
+      console.error("Error updating records:", error);
+      throw error;
+    }
   },
 
-  // Delete multiple records
+  // Bulk delete records
   bulkDelete: async (ids) => {
-    const response = await api.delete("/data/bulk", {
-      data: { ids },
-    });
-    return response.data;
+    try {
+      const response = await api.delete("/data/bulk", {
+        data: { ids },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error deleting records:", error);
+      throw error;
+    }
   },
 
   // Get a single record

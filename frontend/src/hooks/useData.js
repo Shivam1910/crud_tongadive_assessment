@@ -47,13 +47,49 @@ export const useData = (page = 1, limit = 10) => {
     },
   });
 
+  const createRecords = async (records) => {
+    try {
+      await createMutation.mutateAsync(records);
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to create records"
+      );
+    }
+  };
+
+  const updateRecords = async (records) => {
+    try {
+      await updateMutation.mutateAsync(records);
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to update records"
+      );
+    }
+  };
+
+  const deleteRecords = async (ids) => {
+    try {
+      await deleteMutation.mutateAsync(ids);
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to delete records"
+      );
+    }
+  };
+
   return {
-    data,
+    data: {
+      items: data?.items || [],
+      total: data?.total || 0,
+      page: data?.page || 1,
+      limit: data?.limit || 10,
+      totalPages: data?.totalPages || 1,
+    },
     isLoading,
     error,
-    createRecords: createMutation.mutate,
-    updateRecords: updateMutation.mutate,
-    deleteRecords: deleteMutation.mutate,
+    createRecords,
+    updateRecords,
+    deleteRecords,
     isCreating: createMutation.isLoading,
     isUpdating: updateMutation.isLoading,
     isDeleting: deleteMutation.isLoading,
