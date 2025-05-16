@@ -1,40 +1,49 @@
-version: "3.8"
-
 services:
   postgres:
-    image: postgres:14-alpine
+    image: postgres:16-alpine
     environment:
       POSTGRES_DB: bulk_data_manager
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD: root
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
 
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    container_name: bulkdatamanager-backend
     environment:
       - NODE_ENV=development
       - DB_HOST=postgres
       - DB_PORT=5432
       - DB_NAME=bulk_data_manager
       - DB_USER=postgres
-      - DB_PASSWORD=postgres
+      - DB_PASSWORD=root
     ports:
       - "3001:3001"
     volumes:
       - ./backend:/app
       - /app/node_modules
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+    command: npm run dev
+    restart: unless-stopped
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    container_name: bulkdatamanager-frontend
     environment:
       - REACT_APP_API_URL=http://localhost:3001/api
     ports:
@@ -44,6 +53,9 @@ services:
       - /app/node_modules
     depends_on:
       - backend
+    command: npm start
+    restart: unless-stopped
 
 volumes:
   postgres_data:
+    driver: local
