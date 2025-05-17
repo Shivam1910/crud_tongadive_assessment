@@ -1,74 +1,88 @@
 # Bulk Data Manager
 
-A full-stack web application for managing bulk data operations with a Node.js backend and React frontend.
+A full-stack application for managing bulk data operations with PostgreSQL, Node.js backend, and React frontend.
 
 ## Features
 
-- Bulk data creation
-- Data listing with pagination
-- Bulk data deletion
-- Modern UI with Material-UI
-- RESTful API
-- PostgreSQL database
-- Docker support
-
-## Tech Stack
-
-### Backend
-
-- Node.js
-- Express
-- PostgreSQL
-- Sequelize ORM
-- Jest for testing
-
-### Frontend
-
-- React
-- Material-UI
-- React Query
-- Axios
+- Bulk data creation and management
+- Real-time data validation
+- Pagination and sorting
+- RESTful API endpoints
+- Modern React frontend with Material-UI
+- PostgreSQL database integration
+- Docker containerization
 
 ## Prerequisites
 
+- Node.js (v18 or higher)
+- PostgreSQL (v16 or higher)
 - Docker and Docker Compose
-- Node.js 18+ (for local development)
-- PostgreSQL (for local development)
+- npm or yarn package manager
+
+## Project Structure
+
+```
+BulkDataManager/
+├── backend/                 # Node.js backend
+│   ├── src/
+│   │   ├── controllers/    # Request handlers
+│   │   ├── models/        # Database models
+│   │   ├── routes/        # API routes
+│   │   ├── services/      # Business logic
+│   │   └── tests/         # Backend tests
+│   └── Dockerfile
+├── frontend/               # React frontend
+│   ├── src/
+│   │   ├── components/    # React components
+│   │   ├── hooks/        # Custom React hooks
+│   │   └── services/     # API services
+│   └── Dockerfile
+└── docker-compose.yml     # Docker configuration
+```
 
 ## Setup Instructions
 
-1. Clone the repository:
+### Using Docker (Recommended)
+
+1. Install Docker Desktop:
+
+   - Download from [Docker's official website](https://www.docker.com/products/docker-desktop)
+   - Install and start Docker Desktop
+   - Ensure Docker is running (check system tray icon)
+
+2. Clone the repository:
 
    ```bash
    git clone <repository-url>
-   cd bulk-data-manager
+   cd BulkDataManager
    ```
 
-2. Using Docker (Recommended):
+3. Start the application:
 
    ```bash
-   docker-compose up --build
+   # Build and start all services
+   docker-compose up --build -d
+
+   # View logs
+   docker-compose logs -f
    ```
 
-   This will start:
+4. Access the application:
+   - Frontend: http://localhost:3000
+   - Backend API: http://localhost:3001/api
+   - PostgreSQL: localhost:5432
 
-   - PostgreSQL database on port 5432
-   - Backend API on port 3001
-   - Frontend application on port 3000
+### Manual Setup
 
-3. Local Development Setup:
-
-   Backend:
+1. Backend Setup:
 
    ```bash
    cd backend
    npm install
-   cp .env.example .env
-   # Edit .env with your database credentials
    npm run dev
    ```
 
-   Frontend:
+2. Frontend Setup:
 
    ```bash
    cd frontend
@@ -76,53 +90,144 @@ A full-stack web application for managing bulk data operations with a Node.js ba
    npm start
    ```
 
+3. Database Setup:
+   - Create PostgreSQL database named 'bulk_data_manager'
+   - Update environment variables in backend/.env
+
+## Environment Variables
+
+### Backend (.env)
+
+```
+NODE_ENV=development
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=bulk_data_manager
+DB_USER=postgres
+DB_PASSWORD=root
+```
+
+### Frontend (.env)
+
+```
+REACT_APP_API_URL=http://localhost:3001/api
+```
+
 ## API Endpoints
 
+### Data Management
+
 - `POST /api/data/bulk` - Create multiple records
-- `GET /api/data` - List all records with pagination
-- `PUT /api/data/bulk` - Update multiple records
-- `DELETE /api/data/bulk` - Delete multiple records
+- `GET /api/data` - Get paginated records
+- `PUT /api/data/:id` - Update a record
+- `DELETE /api/data/:id` - Delete a record
 
-## Testing
-
-Backend tests:
+### Example API Usage
 
 ```bash
+# Create bulk records
+curl -X POST http://localhost:3001/api/data/bulk \
+  -H "Content-Type: application/json" \
+  -d '[{"name": "Record 1", "value": 100}, {"name": "Record 2", "value": 200}]'
+
+# Get paginated records
+curl http://localhost:3001/api/data?page=1&limit=10
+```
+
+## Development
+
+### Running Tests
+
+```bash
+# Backend tests
 cd backend
+npm test
+
+# Frontend tests
+cd frontend
 npm test
 ```
 
-## Project Structure
+### Code Style
 
+- Backend follows ESLint configuration
+- Frontend uses Prettier for formatting
+- Follow the existing code style in the project
+
+## Docker Commands
+
+```bash
+# Start services
+docker-compose up -d
+
+# Stop services
+docker-compose down
+
+# View logs
+docker-compose logs -f
+
+# Rebuild specific service
+docker-compose up -d --build backend
+
+# Remove all containers and volumes
+docker-compose down -v
 ```
-.
-├── backend/
-│   ├── src/
-│   │   ├── controllers/
-│   │   ├── models/
-│   │   ├── routes/
-│   │   ├── services/
-│   │   └── tests/
-│   ├── Dockerfile
-│   └── package.json
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── services/
-│   │   └── App.js
-│   ├── Dockerfile
-│   └── package.json
-└── docker-compose.yml
-```
+
+## Troubleshooting
+
+### Common Issues
+
+1. Docker Issues:
+
+   - Ensure Docker Desktop is running
+   - Check Docker service status
+   - Verify Windows features (WSL2, Hyper-V)
+
+2. Database Connection:
+
+   - Verify PostgreSQL is running
+   - Check database credentials
+   - Ensure ports are not blocked
+
+3. Frontend Issues:
+   - Clear browser cache
+   - Check API URL configuration
+   - Verify CORS settings
+
+### Debugging
+
+1. Backend:
+
+   ```bash
+   # View backend logs
+   docker-compose logs backend
+
+   # Access backend container
+   docker-compose exec backend sh
+   ```
+
+2. Frontend:
+
+   ```bash
+   # View frontend logs
+   docker-compose logs frontend
+
+   # Access frontend container
+   docker-compose exec frontend sh
+   ```
 
 ## Contributing
 
 1. Fork the repository
-2. Create your feature branch
+2. Create a feature branch
 3. Commit your changes
 4. Push to the branch
-5. Create a new Pull Request
+5. Create a Pull Request
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Support
+
+For support, please open an issue in the repository or contact the maintainers.
